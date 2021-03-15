@@ -29,7 +29,7 @@ class _ChatState extends State<Chat> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Sohbet"),
+        title: Text("BuneaMK"),
       ),
       body: Center(
         child: Column(
