@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 class ChatModel{
 
@@ -6,7 +7,7 @@ class ChatModel{
   final String receiver;
   final bool fromMe;
   final String message;
-  final DateTime dateMessage;
+  final Timestamp dateMessage;
 
   ChatModel({this.sender, this.receiver, this.fromMe, this.message, this.dateMessage});
 
@@ -25,7 +26,7 @@ class ChatModel{
         receiver = map['receiver'],
         fromMe = map['fromMe'],
         message = map['message'],
-        dateMessage = (map['dateMessage'] as Timestamp).toDate();
+        dateMessage = map['dateMessage'];
 
   @override
   String toString() {

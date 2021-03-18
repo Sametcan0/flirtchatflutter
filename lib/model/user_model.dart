@@ -39,6 +39,8 @@ class UserModel{
         updatedAt = (map['updatedAt'] as Timestamp).toDate(),
         level = map['level'];
 
+  UserModel.id({@required this.userId, @required this.profileUrl});
+
   @override
   String toString() {
     return 'UserModel{userId: $userId, email: $email, userName: $userName, profileUrl: $profileUrl, level: $level}'; //createdAt: $createdAt, updatedAt: $updatedAt,

@@ -15,9 +15,7 @@ class ProfileEditPage extends StatefulWidget {
 class _ProfileEditPageState extends State<ProfileEditPage> {
 
   TextEditingController _controllerUserName;
-
   File _profilePhoto;
-
   final picker = ImagePicker();
 
   @override

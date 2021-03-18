@@ -33,36 +33,39 @@ class _KullanicilarPageState extends State<KullanicilarPage> {
             if(sonuc.hasData == true){
               var tumKullanicilar = sonuc.data;
               if(tumKullanicilar.length > 0){
-                return ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: tumKullanicilar.length,
-                    itemBuilder: (context, index){
-                    var currentUserFriend = sonuc.data[index];
-                      if(currentUserFriend.userId != _userViewModel.userModel.userId){
-                        return GestureDetector(
-                          onTap: (){
-                            Navigator.of(context, rootNavigator: true).push(
-                                MaterialPageRoute(builder: (context) => Chat(
-                                  currentSenderUserChat: _userViewModel.userModel,
-                                  currentReceiverUserChat: currentUserFriend,
+                return RefreshIndicator(
+                    onRefresh: _refreshFriendList,
+                    child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: tumKullanicilar.length,
+                        itemBuilder: (context, index){
+                          var currentUserFriend = tumKullanicilar[index];
+                          if(currentUserFriend.userId != _userViewModel.userModel.userId){
+                            return GestureDetector(
+                              onTap: (){
+                                Navigator.of(context, rootNavigator: true).push(
+                                  MaterialPageRoute(builder: (context) => Chat(
+                                    currentSenderUserChat: _userViewModel.userModel,
+                                    currentReceiverUserChat: currentUserFriend,
+                                  ),
+                                  ),
+                                );
+                              },
+                              child: ListTile(
+                                title: Text(currentUserFriend.userName),
+                                subtitle: Text(currentUserFriend.email),
+                                leading:  CircleAvatar(
+                                  radius: 40.0,
+                                  backgroundImage: NetworkImage(currentUserFriend.profileUrl),
                                 ),
                               ),
                             );
-                          },
-                          child: ListTile(
-                            title: Text(currentUserFriend.userName),
-                            subtitle: Text(currentUserFriend.email),
-                            leading:  CircleAvatar(
-                              radius: 40.0,
-                              backgroundImage: NetworkImage(currentUserFriend.profileUrl),
-                            ),
-                          ),
-                        );
-                      }else{
-                        return Container();
-                      }
-                    }
+                          }else{
+                            return Container();
+                          }
+                        }
+                    ),
                 );
               }else{
                 return Center(
@@ -78,5 +81,11 @@ class _KullanicilarPageState extends State<KullanicilarPage> {
         ),
       ),
     );
+  }
+
+  Future<Null> _refreshFriendList() async{
+    await Future.delayed(Duration(seconds: 1));
+    setState(() {});
+    return null;
   }
 }
