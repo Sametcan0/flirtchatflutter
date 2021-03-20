@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flirt/commonWidget/platform_duyarli_alert_dialog.dart';
 import 'package:flutter_flirt/flirtApp/profiler_edit_page.dart';
+import 'package:flutter_flirt/model/user_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_flirt/viewmodels/user_view_model.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -22,7 +23,8 @@ class _ProfilPageState extends State<ProfilPage>{
     UserViewModel _userViewModel = Provider.of<UserViewModel>(context);
     print("Profil sayfasındaki user değerleri: " + _userViewModel.userModel.toString());
 
-    return Scaffold(
+    return
+    Scaffold(
       //backgroundColor: Colors.grey.shade300,
       drawer: Theme(
         data: Theme.of(context).copyWith(
@@ -109,6 +111,7 @@ class _ProfilPageState extends State<ProfilPage>{
       ),
     );
   }
+
   Future<bool> _cikisYap(BuildContext context) async{
     final _userViewModel = Provider.of<UserViewModel>(context, listen: false);
     bool sonuc = await _userViewModel.signOut();

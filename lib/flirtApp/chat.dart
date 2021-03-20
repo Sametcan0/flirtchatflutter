@@ -11,10 +11,11 @@ import 'package:provider/provider.dart';
 
 class Chat extends StatefulWidget {
 
-  final UserModel currentSenderUserChat;
-  final UserModel currentReceiverUserChat;
+  final String receiverUserId;
+  final UserModel senderUser;
 
-  Chat({this.currentSenderUserChat, this.currentReceiverUserChat});
+  const Chat({Key key, this.receiverUserId, this.senderUser}) : super(key: key);
+
 
   @override
   _ChatState createState() => _ChatState();
@@ -28,133 +29,169 @@ class _ChatState extends State<Chat> {
   @override
   Widget build(BuildContext context) {
 
-    UserModel _currentSenderUser = widget.currentSenderUserChat;
-    UserModel _currentReceiverUser = widget.currentReceiverUserChat;
+    String receiverUserId = widget.receiverUserId;
+
     final _userViewModel = Provider.of<UserViewModel>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            CircleAvatar(
-              backgroundImage:
-              NetworkImage(widget.currentReceiverUserChat.profileUrl),
-            ),
-            SizedBox(width: 10.0),
-            Text(
-                widget.currentReceiverUserChat.userName,
-              style: GoogleFonts.ubuntu(
-                textStyle: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
+        title: FutureBuilder<UserModel>(
+          future: getReceiverUser(receiverUserId),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              UserModel receiverUser = snapshot.data;
+              return Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundImage:
+                    NetworkImage(receiverUser.profileUrl),
+                    ),
+                    SizedBox(width: 10.0),
+                    Text(
+                      receiverUser.userName,
+                      style: GoogleFonts.ubuntu(
+                      textStyle: TextStyle(
+                      color: Colors.white,
+                      ),
+                    ),
+                   ),
+                  ],
+              );
+            }else{
+            return Center(
+            child: CircularProgressIndicator(),
+            );
+            }
+          },
         ),
       ),
-      body: Center(
-        child: Column(
-          children: [
-            Expanded(
-              child: StreamBuilder<List<ChatModel>>(
-                stream: _userViewModel.getMessagees(
-                    _currentSenderUser.userId, _currentReceiverUser.userId),
-                builder: (context, streamMessagesList) {
-                  if (!streamMessagesList.hasData) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else {
-                    List<ChatModel> allMessages = streamMessagesList.data;
-                    return ListView.builder(
-                        reverse: true,
-                        controller: _scrollController,
-                        itemCount: allMessages.length,
-                        itemBuilder: (context, index) {
-                          return _creatChatBubble(allMessages[index]);
-                        });
-                  }
-                },
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.only(bottom: 8.0, left: 8.0),
-              child: Row(
+      body: FutureBuilder<UserModel>(
+        future: getReceiverUser(receiverUserId),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            UserModel receiverUser = snapshot.data;
+            return Center(
+              child: Column(
                 children: [
                   Expanded(
-                    child: TextField(
-                      controller: _chatController,
-                      cursorColor: Colors.white,
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        color: Colors.white,
-                      ),
-                      decoration: InputDecoration(
-                        fillColor: Color(0xff9575cd),
-                        filled: true,
-                        hintText: 'Bir mesaj yazın',
-                        hintStyle: TextStyle(
-                          color: Colors.white,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(
-                      horizontal: 4.0,
-                    ),
-                    child: FloatingActionButton(
-                      elevation: 3.0,
-                      backgroundColor: Colors.deepPurple,
-                      child: Icon(
-                        MaterialIcons.send,
-                        size: 35.0,
-                        color: Colors.white,
-                      ),
-                      onPressed: () async {
-                        if (_chatController.text.trim().length > 0) {
-                          ChatModel _saveMessage = ChatModel(
-                            sender: _currentSenderUser.userId,
-                            receiver: _currentReceiverUser.userId,
-                            fromMe: true,
-                            message: _chatController.text,
+                    child: StreamBuilder<List<ChatModel>>(
+                      stream: _userViewModel.getMessagees(
+                          _userViewModel.userModel.userId, receiverUser.userId),
+                      builder: (context, streamMessagesList) {
+                        if (!streamMessagesList.hasData) {
+                          return Center(
+                            child: CircularProgressIndicator(),
                           );
-                          var result =
-                              await _userViewModel.saveMessage(_saveMessage);
-                          if (result == true) {
-                            _chatController.clear();
-                            _scrollController.animateTo(
-                                0.0,
-                                duration: const Duration(milliseconds: 100),
-                                curve: Curves.easeOut);
-                          }
+                        } else {
+                          List<ChatModel> allMessages = streamMessagesList.data;
+                          return ListView.builder(
+                              reverse: true,
+                              controller: _scrollController,
+                              itemCount: allMessages.length,
+                              itemBuilder: (context, index) {
+                                return _creatChatBubble(allMessages[index]);
+                              });
                         }
                       },
                     ),
                   ),
+                  Container(
+                    padding: EdgeInsets.only(bottom: 8.0, left: 8.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _chatController,
+                            cursorColor: Colors.white,
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              color: Colors.white,
+                            ),
+                            decoration: InputDecoration(
+                              fillColor: Color(0xff9575cd),
+                              filled: true,
+                              hintText: 'Bir mesaj yazın',
+                              hintStyle: TextStyle(
+                                color: Colors.white,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.symmetric(
+                            horizontal: 4.0,
+                          ),
+                          child: FloatingActionButton(
+                            elevation: 3.0,
+                            backgroundColor: Colors.deepPurple,
+                            child: Icon(
+                              MaterialIcons.send,
+                              size: 35.0,
+                              color: Colors.white,
+                            ),
+                            onPressed: () async {
+                              if (_chatController.text
+                                  .trim()
+                                  .length > 0) {
+                                ChatModel _saveMessage = ChatModel(
+                                  sender: _userViewModel.userModel.userId,
+                                  receiver: receiverUser.userId,
+                                  fromMe: true,
+                                  message: _chatController.text,
+                                );
+                                var result =
+                                await _userViewModel.saveMessage(_saveMessage);
+                                if (result == true) {
+                                  _chatController.clear();
+                                  _scrollController.animateTo(
+                                      0.0,
+                                      duration: const Duration(
+                                          milliseconds: 100),
+                                      curve: Curves.easeOut);
+                                }
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ],
-        ),
+            );
+          } else {
+            print("Chat hata");
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
     );
   }
 
+  Future<UserModel> getReceiverUser(String receiverUserId) async {
+    UserViewModel _userViewModel = Provider.of<UserViewModel>(context);
+    UserModel receiverUser = await _userViewModel.readUser(receiverUserId);
+    return receiverUser;
+  }
+
   Widget _creatChatBubble(ChatModel currentMessage) {
+
     Color _inCommingMessageColor = Colors.deepPurple.shade500;
     Color _sentMessageColor = Colors.deepPurple.shade300;
 
     var _hoursAndMinValue = '';
 
-    try{
-    _hoursAndMinValue = _hoursAndMinShow(currentMessage.dateMessage ?? Timestamp(1,1));
-    }catch(e){
-      print("hata mesaj saati: "+ e.toString());
+    try {
+      _hoursAndMinValue =
+          _hoursAndMinShow(currentMessage.dateMessage ?? Timestamp(1, 1));
+    } catch (e) {
+      print("hata mesaj saati: " + e.toString());
     }
 
     var messageFromMe = currentMessage.fromMe;
@@ -169,20 +206,20 @@ class _ChatState extends State<Chat> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Flexible(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16.0),
-                        color: _sentMessageColor,
-                      ),
-                      padding: EdgeInsets.all(10.0),
-                      margin: EdgeInsets.all(4.0),
-                      child: Text(
-                        currentMessage.message,
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16.0),
+                      color: _sentMessageColor,
+                    ),
+                    padding: EdgeInsets.all(10.0),
+                    margin: EdgeInsets.all(4.0),
+                    child: Text(
+                      currentMessage.message,
+                      style: TextStyle(
+                        color: Colors.white,
                       ),
                     ),
+                  ),
                 ),
                 Text(_hoursAndMinValue),
               ],
@@ -198,26 +235,26 @@ class _ChatState extends State<Chat> {
           children: [
             Row(
               children: [
-                CircleAvatar(
+                /*CircleAvatar(
                   backgroundImage:
-                      NetworkImage(widget.currentReceiverUserChat.profileUrl),
-                ),
+                  NetworkImage(),
+                ),*/
                 SizedBox(width: 5.0),
                 Flexible(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16.0),
-                        color: _inCommingMessageColor,
-                      ),
-                      padding: EdgeInsets.all(10.0),
-                      margin: EdgeInsets.all(4.0),
-                      child: Text(
-                        currentMessage.message,
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16.0),
+                      color: _inCommingMessageColor,
+                    ),
+                    padding: EdgeInsets.all(10.0),
+                    margin: EdgeInsets.all(4.0),
+                    child: Text(
+                      currentMessage.message,
+                      style: TextStyle(
+                        color: Colors.white,
                       ),
                     ),
+                  ),
                 ),
                 Text(_hoursAndMinValue),
               ],
@@ -228,8 +265,8 @@ class _ChatState extends State<Chat> {
     }
   }
 
-  String _hoursAndMinShow(Timestamp dateMessage) {
 
+  String _hoursAndMinShow(Timestamp dateMessage) {
     var _formatter = DateFormat.Hm();
     var _formattedDate = _formatter.format(dateMessage.toDate());
     return _formattedDate;

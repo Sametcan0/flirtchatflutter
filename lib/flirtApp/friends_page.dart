@@ -5,6 +5,9 @@ import 'package:flutter_flirt/viewmodels/user_view_model.dart';
 import 'package:provider/provider.dart';
 
 class KullanicilarPage extends StatefulWidget {
+
+
+
   @override
   _KullanicilarPageState createState() => _KullanicilarPageState();
 }
@@ -12,7 +15,8 @@ class KullanicilarPage extends StatefulWidget {
 class _KullanicilarPageState extends State<KullanicilarPage> {
   @override
   Widget build(BuildContext context) {
-
+    Chat getData = new Chat();
+    var receiverUserIdInFriends =  getData.receiverUserId;
     UserViewModel _userViewModel = Provider.of<UserViewModel>(context);
     _userViewModel.getAllUsers();
 
@@ -46,8 +50,8 @@ class _KullanicilarPageState extends State<KullanicilarPage> {
                               onTap: (){
                                 Navigator.of(context, rootNavigator: true).push(
                                   MaterialPageRoute(builder: (context) => Chat(
-                                    currentSenderUserChat: _userViewModel.userModel,
-                                    currentReceiverUserChat: currentUserFriend,
+                                    senderUser: _userViewModel.userModel,
+                                    receiverUserId: receiverUserIdInFriends,
                                   ),
                                   ),
                                 );

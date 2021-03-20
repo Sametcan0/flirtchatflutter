@@ -28,7 +28,7 @@ class UserRepository implements AuthBase {
       return await _fakeAuthService.currentUser();
     } else {
       UserModel _userModel = await _firebaseAuthService.currentUser();
-      return await _firestoreDBService.readUser(_userModel.userId);
+      return await _firestoreDBService.readUser(_userModel.userId, );
     }
   }
 
@@ -95,7 +95,6 @@ class UserRepository implements AuthBase {
   }
 
   @override
-  // ignore: missing_return
   Future<UserModel> signInWithEmailAndPasword(
       String email, String sifre) async {
     if (appMode == AppMode.DEBUG) {
@@ -187,4 +186,10 @@ class UserRepository implements AuthBase {
     }
     return null;
   }
+
+  Future<UserModel> readUser(String userId) async{
+    var result = await _firestoreDBService.readUser(userId);
+    return result;
+  }
+
 }

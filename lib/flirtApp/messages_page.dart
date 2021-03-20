@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flirt/flirtApp/chat.dart';
-import 'package:flutter_flirt/model/user_model.dart';
 import 'package:flutter_flirt/model/usually_chat_model.dart';
 import 'package:flutter_flirt/viewmodels/user_view_model.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +12,10 @@ class MessagesPage extends StatefulWidget {
 class _MessagesPageState extends State<MessagesPage> {
   @override
   Widget build(BuildContext context) {
+
+    Chat getData = new Chat();
+    var receiverUserIdInMessages =  getData.receiverUserId;
+
     UserViewModel _userViewModel = Provider.of<UserViewModel>(context);
 
     return Scaffold(
@@ -33,7 +36,7 @@ class _MessagesPageState extends State<MessagesPage> {
               child: CircularProgressIndicator(),
             );
           } else {
-            var allUsuallyChat = chatList.data;
+            List<UsuallyChatModel> allUsuallyChat = chatList.data;
 
             return RefreshIndicator(
               onRefresh: _refreshChatList,
@@ -46,13 +49,9 @@ class _MessagesPageState extends State<MessagesPage> {
                         Navigator.of(context, rootNavigator: true)
                             .push(MaterialPageRoute(
                                 builder: (context) => Chat(
-                                      currentSenderUserChat:
+                                      senderUser:
                                           _userViewModel.userModel,
-                                      currentReceiverUserChat: UserModel.id(
-                                          userId: currentUsuallyChat
-                                              .messageReceiver,
-                                          profileUrl: currentUsuallyChat
-                                              .receiverProfileUrl),
+                                      receiverUserId: receiverUserIdInMessages,
                                     )));
                       },
                       child: ListTile(

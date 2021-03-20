@@ -24,13 +24,14 @@ class FirestoreDBService implements DBBase{
 
   @override
   Future<UserModel> readUser(String userId) async {
-    DocumentSnapshot _okunanUser = await _firebaseDB.collection('users').doc(
+    DocumentSnapshot _readUser = await _firebaseDB.collection('users').doc(
         userId).get();
 
-    Map<String, dynamic> _okunanUserBilgileri = _okunanUser.data();
-    UserModel _okunanUserNesnesi = UserModel.fromMap(_okunanUserBilgileri);
-    /*print('Okunan User Nesnesi' + _okunanUserNesnesi.toString());*/
-    return _okunanUserNesnesi;
+    Map<String, dynamic> _readUserInfo = _readUser.data();
+
+    UserModel _readUserObject = UserModel.fromMap(_readUserInfo);
+
+    return _readUserObject;
   }
 
   @override
